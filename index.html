@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Lawn Care Schedule</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2050%2050%27%3E%3Cpath%20d%3D%27M12%2048%20C11%2038%209%2024%2011%2012%20C11%208%2013%206%2014%206%20C15%206%2016%208%2015%2013%20C14%2025%2013%2039%2013%2048%20Z%27%20fill%3D%27%233A8C3A%27%2F%3E%3Cpath%20d%3D%27M23%2048%20C22%2036%2020%2021%2021%208%20C22%204%2023%202%2024%202%20C25%202%2026%204%2026%209%20C25%2022%2024%2037%2024%2048%20Z%27%20fill%3D%27%234CAF50%27%2F%3E%3Cpath%20d%3D%27M34%2048%20C33%2035%2032%2019%2033%205%20C34%201%2035%200%2036%200%20C37%200%2038%201%2037%206%20C36%2020%2035%2036%2035%2048%20Z%27%20fill%3D%27%2366BB6A%27%2F%3E%3C%2Fsvg%3E">
+</head>
+<style>
+  body {
+    font-family: sans-serif;
+    padding: 1rem;
+    background: #fff;
+    color: #222;
+  }
+
+  .section-header {
+    font-size: 11px;
+    font-weight: 500;
+    color: #888;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 1.5rem;
+  }
+
+  .month-label {
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .task-row-label {
+    font-size: 10px;
+    color: #555;
+    text-align: right;
+    padding-right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 22px;
+    margin-bottom: 3px;
+    white-space: nowrap;
+  }
+
+  .bar-slot {
+    height: 22px;
+    margin-bottom: 3px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+
+  .bar-slot:hover {
+    opacity: .75;
+  }
+
+  .bar-slot.inactive {
+    background: #f0f0f0 !important;
+    cursor: default;
+    opacity: 1;
+  }
+
+  .detail-card {
+    background: #f7f7f5;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    border: 0.5px solid #ddd;
+    border-left: 3px solid #3B8BD4;
+    display: none;
+  }
+
+  .detail-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 6px;
+  }
+
+  .detail-card p {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .season-card {
+    background: #f7f7f5;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+    border: 0.5px solid #ddd;
+  }
+
+  .season-card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 6px;
+  }
+
+  .season-card ul {
+    margin: 6px 0 0;
+    padding-left: 1.2rem;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+  }
+</style>
+</head>
+
+<body>
+  <div class="section-header">Annual schedule — click any bar to learn more</div>
+  <div style="display:grid;grid-template-columns:90px 1fr;gap:0;">
+    <div></div>
+    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:4px;">
+      <div class="month-label">Jan</div>
+      <div class="month-label">Feb</div>
+      <div class="month-label">Mar</div>
+      <div class="month-label">Apr</div>
+      <div class="month-label">May</div>
+      <div class="month-label">Jun</div>
+      <div class="month-label">Jul</div>
+      <div class="month-label">Aug</div>
+      <div class="month-label">Sep</div>
+      <div class="month-label">Oct</div>
+      <div class="month-label">Nov</div>
+      <div class="month-label">Dec</div>
+    </div>
+  </div>
+  <div id="schedule-rows"></div>
+  <div class="detail-card" id="detail-box">
+    <h3 id="detail-title"></h3>
+    <p id="detail-body"></p>
+  </div>
+  <div class="section-header" style="margin-top:2rem;">Key actions by season</div>
+  <div id="season-cards"></div>
+
+  <script>
+    const tasks = [
+      {
+        label: 'Pre-emergent', color: '#BA7517', active: [2, 3, 8, 9], details: {
+          2: { title: 'Crabgrass pre-emergent (March)', body: 'Apply a pre-emergent herbicide (prodiamine or pendimethalin) when soil temps reach 50–55°F for 3 consecutive days — typically early-to-mid March in central Indiana. This is your most critical step given last year\'s crabgrass. Apply before forsythia blooms. Do NOT overseed in the same 8–12 weeks after application.' },
+          3: { title: 'Pre-emergent follow-up (April)', body: 'A split application (half in March, half in April) extends the barrier window 2–3 extra weeks. Especially useful on a heavily infested lawn. Granular products like Barricade 0-0-7 work well here.' },
+          8: { title: 'Fall pre-emergent (September)', body: 'Optional fall pre-emergent targets winter annual weeds like henbit and chickweed. Use sparingly — only if these were a problem last year. Skip if you\'re overseeding this fall, as it will block germination.' },
+          9: { title: 'Pre-emergent follow-up (October)', body: 'Second application of fall pre-emergent if needed for winter weed pressure. Do not apply if you overseeded in September.' },
+        }
+      },
+      {
+        label: 'Fertilize', color: '#3B6D11', active: [3, 5, 8, 9, 10], details: {
+          3: { title: 'Light spring feeding (April)', body: 'Apply a balanced slow-release fertilizer (e.g. 18-0-6). Go light — 0.5 lb nitrogen per 1,000 sq ft. Heavy spring N causes excessive top growth at the expense of roots.' },
+          5: { title: 'Early summer feeding (June)', body: 'Optional light feeding (0.5 lb N/1,000 sq ft) before summer heat sets in. Use a slow-release formula. Skip if your lawn is struggling in heat.' },
+          8: { title: 'Fall starter fertilizer (September)', body: 'Most important feeding of the year for cool-season grasses. Apply 1 lb N/1,000 sq ft of a high-N fertilizer (e.g. 32-0-10). Timing with overseeding: fertilize at seeding or just after.' },
+          9: { title: 'Fall feeding (October)', body: 'Second fall feeding with a winterizer formula — higher potassium (K) to harden the grass for winter. E.g. 24-0-12. Apply 1 lb N/1,000 sq ft.' },
+          10: { title: 'Winterizer (November)', body: 'Final feeding before ground freezes. A dormant feed of 0.5–1 lb N/1,000 sq ft in early November helps the lawn store carbohydrates for winter and green up faster in spring.' },
+        }
+      },
+      {
+        label: 'Overseed / Aerate', color: '#0C447C', active: [8, 9], details: {
+          8: { title: 'Core aeration + overseeding (mid-September)', body: 'The #1 tool for thickening your lawn. Core aerate first, then overseed immediately after. Use a quality tall fescue or KBG blend. Apply at 4–6 lbs/1,000 sq ft for overseeding. Keep seed moist for 2–3 weeks.' },
+          9: { title: 'Overseeding window closes (October)', body: 'Overseeding should be done by early October at the latest in central Indiana to allow 6+ weeks of growth before frost.' },
+        }
+      },
+      {
+        label: 'Broadleaf weeds', color: '#993556', active: [3, 4, 9, 10], details: {
+          3: { title: 'Spring broadleaf treatment (April)', body: 'Apply a post-emergent broadleaf herbicide (2,4-D + MCPP + dicamba blend, e.g. Trimec) when weeds are actively growing and daytime temps are 60–80°F. Targets dandelions, clover, ground ivy, plantain.' },
+          4: { title: 'Spot-spray broadleaf weeds (May)', body: 'Spot-treat any remaining broadleaf weeds. Avoid blanket spraying during summer heat above 85°F. Liquid formulations work faster than granular.' },
+          9: { title: 'Fall broadleaf treatment (October)', body: 'Fall is the best time to treat broadleaf weeds. Weeds are pulling nutrients into roots for winter — they absorb herbicides more effectively. Often more effective than spring.' },
+          10: { title: 'Last broadleaf spray (November)', body: 'Apply before first hard frost. Weeds must still be actively growing for herbicide absorption.' },
+        }
+      },
+      {
+        label: 'Watering focus', color: '#185FA5', active: [5, 6, 7], details: {
+          5: { title: 'Establish watering schedule (June)', body: 'Start deep, infrequent watering: 1 to 1.5 inches per week, applied 2–3 times per week. Early morning is best — reduces evaporation and fungal risk.' },
+          6: { title: 'Summer watering (July)', body: 'Most critical period for cool-season grasses. Keep dormant grass alive with ½ inch every 2 weeks minimum. If irrigating to keep it green, maintain 1–1.5 inches/week consistently.' },
+          7: { title: 'Late summer watering (August)', body: 'Continue 1–1.5 inches/week. As temps drop after mid-August the lawn recovers from summer stress. Ramp up slightly in preparation for fall overseeding.' },
+        }
+      },
+      {
+        label: 'Soil test', color: '#534AB7', active: [7], details: {
+          7: { title: 'Soil test (August)', body: 'Send a soil sample to Purdue Extension in late August. Results guide fall fertilizer and lime applications. Cost ~$15–20. Indiana soils often need lime to raise pH to 6.5–7.0 — the sweet spot for cool-season turf.' },
+        }
+      },
+    ];
+
+    const seasonCards = [
+      { season: 'Early spring (Mar–Apr)', color: '#BA7517', actions: ['Pre-emergent herbicide is priority #1 — apply when soil hits 50°F (usually mid-March). Directly attacks last year\'s crabgrass seed bank.', 'Light fertilizer application (0.5 lb N/1,000 sq ft) — optional if using a combo pre-em/fert product.', 'Spot-treat broadleaf weeds as they emerge.', 'Do NOT overseed while pre-emergent is active.'] },
+      { season: 'Late spring / Summer (May–Aug)', color: '#185FA5', actions: ['Mow at 3.5–4 inches — taller grass shades soil and suppresses crabgrass germination naturally.', 'Water deeply 2–3x per week. Shallow, frequent watering encourages crabgrass.', 'Avoid fertilizing during peak heat (July–Aug).', 'Soil test in late August to guide fall applications.'] },
+      { season: 'Fall (Sep–Nov)', color: '#3B6D11', actions: ['Core aerate + overseed in mid-September — this is how you thicken the lawn. Dense turf is the best long-term weed suppressor.', 'Apply your heaviest fertilizer applications of the year (September and October/November).', 'Broadleaf herbicide in October — most effective time of year for perennial weeds.', 'Apply lime if your soil test recommends it (fall is ideal timing).'] },
+      { season: 'Winter (Dec–Feb)', color: '#534AB7', actions: ['No lawn treatments needed.', 'Plan next year\'s schedule — order products early (pre-emergents sell out in Feb/March).', 'Review what worked and what didn\'t from the previous season.'] },
+    ];
+
+    function renderSchedule() {
+      const container = document.getElementById('schedule-rows');
+      tasks.forEach(task => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:grid;grid-template-columns:90px 1fr;gap:0;';
+        const label = document.createElement('div');
+        label.className = 'task-row-label';
+        label.textContent = task.label;
+        const bars = document.createElement('div');
+        bars.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
+        for (let m = 0; m < 12; m++) {
+          const slot = document.createElement('div');
+          slot.className = 'bar-slot' + (task.active.includes(m) ? '' : ' inactive');
+          slot.style.background = task.active.includes(m) ? task.color : '#f0f0f0';
+          if (task.active.includes(m)) {
+            slot.addEventListener('click', () => {
+              const d = task.details[m];
+              if (!d) return;
+              document.getElementById('detail-title').textContent = d.title;
+              document.getElementById('detail-body').textContent = d.body;
+              document.getElementById('detail-box').style.display = 'block';
+            });
+          }
+          bars.appendChild(slot);
+        }
+        row.appendChild(label);
+        row.appendChild(bars);
+        container.appendChild(row);
+      });
+    }
+
+    function renderSeasonCards() {
+      const container = document.getElementById('season-cards');
+      seasonCards.forEach(card => {
+        const el = document.createElement('div');
+        el.className = 'season-card';
+        el.style.borderLeft = '3px solid ' + card.color;
+        el.innerHTML = '<h3>' + card.season + '</h3>';
+        const ul = document.createElement('ul');
+        card.actions.forEach(a => { const li = document.createElement('li'); li.textContent = a; ul.appendChild(li); });
+        el.appendChild(ul);
+        container.appendChild(el);
+      });
+    }
+
+    renderSchedule();
+    renderSeasonCards();
+  </script>
+</body>
+
+</html>
