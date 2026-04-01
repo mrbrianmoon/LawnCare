@@ -1,245 +1,462 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Lawn Care Schedule</title>
-  <link rel="icon"
-    href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2050%2050%27%3E%3Cpath%20d%3D%27M12%2048%20C11%2038%209%2024%2011%2012%20C11%208%2013%206%2014%206%20C15%206%2016%208%2015%2013%20C14%2025%2013%2039%2013%2048%20Z%27%20fill%3D%27%233A8C3A%27%2F%3E%3Cpath%20d%3D%27M23%2048%20C22%2036%2020%2021%2021%208%20C22%204%2023%202%2024%202%20C25%202%2026%204%2026%209%20C25%2022%2024%2037%2024%2048%20Z%27%20fill%3D%27%234CAF50%27%2F%3E%3Cpath%20d%3D%27M34%2048%20C33%2035%2032%2019%2033%205%20C34%201%2035%200%2036%200%20C37%200%2038%201%2037%206%20C36%2020%2035%2036%2035%2048%20Z%27%20fill%3D%27%2366BB6A%27%2F%3E%3C%2Fsvg%3E">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yard Care — Central Indiana</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --border: #e2ddd5;
+    --text: #1a1a18;
+    --muted: #6b6860;
+    --hint: #a09d97;
+    --accent-lawn: #3B6D11;
+    --accent-tree: #1D5C8A;
+    --tab-h: 56px;
+  }
+
   body {
-    font-family: sans-serif;
-    padding: 1rem;
-    background: #fff;
-    color: #222;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
   }
 
-  .section-header {
-    font-size: 11px;
-    font-weight: 500;
-    color: #888;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    margin-top: 1.5rem;
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
   }
 
-  .month-label {
-    font-size: 10px;
-    color: #888;
-    text-align: center;
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
-
-  .task-row-label {
-    font-size: 10px;
-    color: #555;
-    text-align: right;
-    padding-right: 6px;
+  .site-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    height: 22px;
-    margin-bottom: 3px;
+    padding-right: 2rem;
+    border-right: 1px solid var(--border);
     white-space: nowrap;
+    letter-spacing: -0.01em;
   }
 
-  .bar-slot {
-    height: 22px;
-    margin-bottom: 3px;
-    border-radius: 4px;
+  .tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding-left: 1rem;
+  }
+
+  .tab-btn {
+    height: var(--tab-h);
+    padding: 0 1.25rem;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
     cursor: pointer;
-    transition: opacity .15s;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
   }
 
-  .bar-slot:hover {
-    opacity: .75;
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--text);
+    font-weight: 500;
+    border-bottom-color: var(--active-color, var(--accent-lawn));
   }
 
-  .bar-slot.inactive {
-    background: #f0f0f0 !important;
-    cursor: default;
-    opacity: 1;
+  .tab-btn[data-tab="lawn"].active { --active-color: var(--accent-lawn); }
+  .tab-btn[data-tab="arborvitae"].active { --active-color: var(--accent-tree); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
   }
 
-  .detail-card {
-    background: #f7f7f5;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
+  .page-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hint);
+    margin-bottom: 10px;
+    margin-top: 2rem;
+  }
+
+  .schedule-grid {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .month-header-row {
+    display: grid;
+    grid-template-columns: 120px repeat(12, 1fr);
+    gap: 3px;
+    margin-bottom: 6px;
+  }
+
+  .month-lbl {
+    font-size: 10px;
+    color: var(--hint);
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 120px repeat(12, 1fr);
+    gap: 3px;
+    margin-bottom: 3px;
+    align-items: center;
+  }
+
+  .task-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    padding-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar {
+    height: 20px;
+    border-radius: 3px;
+    background: #ece9e3;
+    transition: opacity 0.15s;
+  }
+
+  .bar.on { cursor: pointer; }
+  .bar.on:hover { opacity: 0.75; }
+
+  .detail-panel {
     margin-top: 1rem;
-    border: 0.5px solid #ddd;
-    border-left: 3px solid #3B8BD4;
+    padding: 1rem 1.25rem;
+    background: #f9f8f5;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     display: none;
   }
 
-  .detail-card h3 {
-    font-size: 14px;
-    font-weight: 500;
-    margin: 0 0 6px;
+  .detail-panel.visible { display: block; }
+
+  .detail-panel h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 6px;
+    color: var(--text);
   }
 
-  .detail-card p {
+  .detail-panel p {
     font-size: 13px;
-    color: #555;
-    margin: 0;
-    line-height: 1.6;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .season-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
   }
 
   .season-card {
-    background: #f7f7f5;
-    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     padding: 1rem 1.25rem;
-    margin-bottom: .75rem;
-    border: 0.5px solid #ddd;
+    border-top-width: 3px;
   }
 
   .season-card h3 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    margin: 0 0 6px;
+    margin-bottom: 10px;
+    color: var(--text);
   }
 
   .season-card ul {
-    margin: 6px 0 0;
-    padding-left: 1.2rem;
-    font-size: 13px;
-    color: #555;
-    line-height: 1.7;
+    list-style: none;
+    padding: 0;
+  }
+
+  .season-card ul li {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    padding-left: 10px;
+    position: relative;
+  }
+
+  .season-card ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--dot-color, #ccc);
+  }
+
+  .season-card ul li:last-child { border-bottom: none; }
+
+  @media (max-width: 640px) {
+    header { padding: 0 1rem; }
+    .site-title { font-size: 15px; padding-right: 1rem; }
+    .container { padding: 1.5rem 1rem; }
+    .task-lbl { font-size: 9px; padding-right: 6px; }
+    .season-cards { grid-template-columns: 1fr; }
   }
 </style>
 </head>
-
 <body>
-  <div class="section-header">Annual schedule — click any bar to learn more</div>
-  <div style="display:grid;grid-template-columns:90px 1fr;gap:0;">
-    <div></div>
-    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:4px;">
-      <div class="month-label">Jan</div>
-      <div class="month-label">Feb</div>
-      <div class="month-label">Mar</div>
-      <div class="month-label">Apr</div>
-      <div class="month-label">May</div>
-      <div class="month-label">Jun</div>
-      <div class="month-label">Jul</div>
-      <div class="month-label">Aug</div>
-      <div class="month-label">Sep</div>
-      <div class="month-label">Oct</div>
-      <div class="month-label">Nov</div>
-      <div class="month-label">Dec</div>
+
+<header>
+  <div class="site-title">Yard Care</div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="lawn" onclick="switchTab('lawn')">Lawn</button>
+    <button class="tab-btn" data-tab="arborvitae" onclick="switchTab('arborvitae')">Arborvitae</button>
+  </nav>
+</header>
+
+<div id="tab-lawn" class="tab-panel active">
+  <div class="container">
+    <h1 class="page-heading">Lawn Care</h1>
+    <p class="page-sub">Central Indiana — cool-season grass, crabgrass prevention &amp; thickening plan</p>
+    <div class="section-label">Annual schedule — click any bar for details</div>
+    <div class="schedule-grid" id="lawn-grid"></div>
+    <div class="detail-panel" id="lawn-detail">
+      <h3 id="lawn-detail-title"></h3>
+      <p id="lawn-detail-body"></p>
     </div>
+    <div class="section-label">Key actions by season</div>
+    <div class="season-cards" id="lawn-seasons"></div>
   </div>
-  <div id="schedule-rows"></div>
-  <div class="detail-card" id="detail-box">
-    <h3 id="detail-title"></h3>
-    <p id="detail-body"></p>
+</div>
+
+<div id="tab-arborvitae" class="tab-panel">
+  <div class="container">
+    <h1 class="page-heading">Arborvitae Care</h1>
+    <p class="page-sub">10 Giant Arborvitae (Thuja plicata) — year 2 establishment, central Indiana</p>
+    <div class="section-label">Annual schedule — click any bar for details</div>
+    <div class="schedule-grid" id="tree-grid"></div>
+    <div class="detail-panel" id="tree-detail">
+      <h3 id="tree-detail-title"></h3>
+      <p id="tree-detail-body"></p>
+    </div>
+    <div class="section-label">Key actions by season</div>
+    <div class="season-cards" id="tree-seasons"></div>
   </div>
-  <div class="section-header" style="margin-top:2rem;">Key actions by season</div>
-  <div id="season-cards"></div>
+</div>
 
-  <script>
-    const tasks = [
-      {
-        label: 'Pre-emergent', color: '#BA7517', active: [2, 3, 8, 9], details: {
-          2: { title: 'Crabgrass pre-emergent (March)', body: 'Apply a pre-emergent herbicide (prodiamine or pendimethalin) when soil temps reach 50–55°F for 3 consecutive days — typically early-to-mid March in central Indiana. This is your most critical step given last year\'s crabgrass. Apply before forsythia blooms. Do NOT overseed in the same 8–12 weeks after application.' },
-          3: { title: 'Pre-emergent follow-up (April)', body: 'A split application (half in March, half in April) extends the barrier window 2–3 extra weeks. Especially useful on a heavily infested lawn. Granular products like Barricade 0-0-7 work well here.' },
-          8: { title: 'Fall pre-emergent (September)', body: 'Optional fall pre-emergent targets winter annual weeds like henbit and chickweed. Use sparingly — only if these were a problem last year. Skip if you\'re overseeding this fall, as it will block germination.' },
-          9: { title: 'Pre-emergent follow-up (October)', body: 'Second application of fall pre-emergent if needed for winter weed pressure. Do not apply if you overseeded in September.' },
-        }
-      },
-      {
-        label: 'Fertilize', color: '#3B6D11', active: [3, 5, 8, 9, 10], details: {
-          3: { title: 'Light spring feeding (April)', body: 'Apply a balanced slow-release fertilizer (e.g. 18-0-6). Go light — 0.5 lb nitrogen per 1,000 sq ft. Heavy spring N causes excessive top growth at the expense of roots.' },
-          5: { title: 'Early summer feeding (June)', body: 'Optional light feeding (0.5 lb N/1,000 sq ft) before summer heat sets in. Use a slow-release formula. Skip if your lawn is struggling in heat.' },
-          8: { title: 'Fall starter fertilizer (September)', body: 'Most important feeding of the year for cool-season grasses. Apply 1 lb N/1,000 sq ft of a high-N fertilizer (e.g. 32-0-10). Timing with overseeding: fertilize at seeding or just after.' },
-          9: { title: 'Fall feeding (October)', body: 'Second fall feeding with a winterizer formula — higher potassium (K) to harden the grass for winter. E.g. 24-0-12. Apply 1 lb N/1,000 sq ft.' },
-          10: { title: 'Winterizer (November)', body: 'Final feeding before ground freezes. A dormant feed of 0.5–1 lb N/1,000 sq ft in early November helps the lawn store carbohydrates for winter and green up faster in spring.' },
-        }
-      },
-      {
-        label: 'Overseed / Aerate', color: '#0C447C', active: [8, 9], details: {
-          8: { title: 'Core aeration + overseeding (mid-September)', body: 'The #1 tool for thickening your lawn. Core aerate first, then overseed immediately after. Use a quality tall fescue or KBG blend. Apply at 4–6 lbs/1,000 sq ft for overseeding. Keep seed moist for 2–3 weeks.' },
-          9: { title: 'Overseeding window closes (October)', body: 'Overseeding should be done by early October at the latest in central Indiana to allow 6+ weeks of growth before frost.' },
-        }
-      },
-      {
-        label: 'Broadleaf weeds', color: '#993556', active: [3, 4, 9, 10], details: {
-          3: { title: 'Spring broadleaf treatment (April)', body: 'Apply a post-emergent broadleaf herbicide (2,4-D + MCPP + dicamba blend, e.g. Trimec) when weeds are actively growing and daytime temps are 60–80°F. Targets dandelions, clover, ground ivy, plantain.' },
-          4: { title: 'Spot-spray broadleaf weeds (May)', body: 'Spot-treat any remaining broadleaf weeds. Avoid blanket spraying during summer heat above 85°F. Liquid formulations work faster than granular.' },
-          9: { title: 'Fall broadleaf treatment (October)', body: 'Fall is the best time to treat broadleaf weeds. Weeds are pulling nutrients into roots for winter — they absorb herbicides more effectively. Often more effective than spring.' },
-          10: { title: 'Last broadleaf spray (November)', body: 'Apply before first hard frost. Weeds must still be actively growing for herbicide absorption.' },
-        }
-      },
-      {
-        label: 'Watering focus', color: '#185FA5', active: [5, 6, 7], details: {
-          5: { title: 'Establish watering schedule (June)', body: 'Start deep, infrequent watering: 1 to 1.5 inches per week, applied 2–3 times per week. Early morning is best — reduces evaporation and fungal risk.' },
-          6: { title: 'Summer watering (July)', body: 'Most critical period for cool-season grasses. Keep dormant grass alive with ½ inch every 2 weeks minimum. If irrigating to keep it green, maintain 1–1.5 inches/week consistently.' },
-          7: { title: 'Late summer watering (August)', body: 'Continue 1–1.5 inches/week. As temps drop after mid-August the lawn recovers from summer stress. Ramp up slightly in preparation for fall overseeding.' },
-        }
-      },
-      {
-        label: 'Soil test', color: '#534AB7', active: [7], details: {
-          7: { title: 'Soil test (August)', body: 'Send a soil sample to Purdue Extension in late August. Results guide fall fertilizer and lime applications. Cost ~$15–20. Indiana soils often need lime to raise pH to 6.5–7.0 — the sweet spot for cool-season turf.' },
-        }
-      },
-    ];
+<script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-    const seasonCards = [
-      { season: 'Early spring (Mar–Apr)', color: '#BA7517', actions: ['Pre-emergent herbicide is priority #1 — apply when soil hits 50°F (usually mid-March). Directly attacks last year\'s crabgrass seed bank.', 'Light fertilizer application (0.5 lb N/1,000 sq ft) — optional if using a combo pre-em/fert product.', 'Spot-treat broadleaf weeds as they emerge.', 'Do NOT overseed while pre-emergent is active.'] },
-      { season: 'Late spring / Summer (May–Aug)', color: '#185FA5', actions: ['Mow at 3.5–4 inches — taller grass shades soil and suppresses crabgrass germination naturally.', 'Water deeply 2–3x per week. Shallow, frequent watering encourages crabgrass.', 'Avoid fertilizing during peak heat (July–Aug).', 'Soil test in late August to guide fall applications.'] },
-      { season: 'Fall (Sep–Nov)', color: '#3B6D11', actions: ['Core aerate + overseed in mid-September — this is how you thicken the lawn. Dense turf is the best long-term weed suppressor.', 'Apply your heaviest fertilizer applications of the year (September and October/November).', 'Broadleaf herbicide in October — most effective time of year for perennial weeds.', 'Apply lime if your soil test recommends it (fall is ideal timing).'] },
-      { season: 'Winter (Dec–Feb)', color: '#534AB7', actions: ['No lawn treatments needed.', 'Plan next year\'s schedule — order products early (pre-emergents sell out in Feb/March).', 'Review what worked and what didn\'t from the previous season.'] },
-    ];
+const lawnTasks = [
+  { label:'Pre-emergent', color:'#BA7517', active:[2,3,8,9], details:{
+    2:{title:'Crabgrass pre-emergent (March)',body:'Apply a pre-emergent herbicide (prodiamine or pendimethalin) when soil temps reach 50–55°F for 3 consecutive days — typically early-to-mid March in central Indiana. This is your most critical step given last year\'s crabgrass. Apply before forsythia blooms. Do NOT overseed in the same 8–12 weeks after application.'},
+    3:{title:'Pre-emergent follow-up (April)',body:'A split application (half in March, half in April) extends the barrier window 2–3 extra weeks. Especially useful on a heavily infested lawn. Granular products like Barricade 0-0-7 work well here.'},
+    8:{title:'Fall pre-emergent (September)',body:'Optional fall pre-emergent targets winter annual weeds like henbit and chickweed. Use sparingly — only if these were a problem last year. Skip if you\'re overseeding this fall, as it will block germination.'},
+    9:{title:'Pre-emergent follow-up (October)',body:'Second application of fall pre-emergent if needed for winter weed pressure. Do not apply if you overseeded in September.'},
+  }},
+  { label:'Fertilize', color:'#3B6D11', active:[3,5,8,9,10], details:{
+    3:{title:'Light spring feeding (April)',body:'Apply a balanced slow-release fertilizer (e.g. 18-0-6). Go light — 0.5 lb nitrogen per 1,000 sq ft. Heavy spring N causes excessive top growth at the expense of roots.'},
+    5:{title:'Early summer feeding (June)',body:'Optional light feeding (0.5 lb N/1,000 sq ft) before summer heat sets in. Use a slow-release formula. Skip if your lawn is struggling in heat.'},
+    8:{title:'Fall starter fertilizer (September)',body:'Most important feeding of the year for cool-season grasses. Apply 1 lb N/1,000 sq ft of a high-N fertilizer (e.g. 32-0-10). Time with overseeding if applicable.'},
+    9:{title:'Fall feeding (October)',body:'Second fall feeding with a winterizer formula — higher potassium (K) to harden grass for winter. E.g. 24-0-12. Apply 1 lb N/1,000 sq ft.'},
+    10:{title:'Winterizer (November)',body:'Final feeding before ground freezes. A dormant feed of 0.5–1 lb N/1,000 sq ft in early November helps the lawn store carbohydrates for winter and green up faster in spring.'},
+  }},
+  { label:'Overseed / Aerate', color:'#0C447C', active:[8,9], details:{
+    8:{title:'Core aeration + overseeding (mid-September)',body:'The #1 tool for thickening your lawn. Core aerate first, then overseed immediately after. Use a quality tall fescue or KBG blend. Apply at 4–6 lbs/1,000 sq ft for overseeding, 8–10 lbs for bare areas. Keep seed moist for 2–3 weeks.'},
+    9:{title:'Overseeding window closes (October)',body:'Overseeding should be done by early October at the latest in central Indiana to allow 6+ weeks of growth before frost.'},
+  }},
+  { label:'Broadleaf weeds', color:'#993556', active:[3,4,9,10], details:{
+    3:{title:'Spring broadleaf treatment (April)',body:'Apply a post-emergent broadleaf herbicide (2,4-D + MCPP + dicamba blend, e.g. Trimec) when weeds are actively growing and daytime temps are 60–80°F. Targets dandelions, clover, ground ivy, plantain.'},
+    4:{title:'Spot-spray broadleaf weeds (May)',body:'Spot-treat any remaining broadleaf weeds. Avoid blanket spraying during summer heat above 85°F. Liquid formulations work faster than granular.'},
+    9:{title:'Fall broadleaf treatment (October)',body:'Fall is the best time to treat broadleaf weeds. Weeds pull nutrients into roots for winter — they absorb herbicides more effectively. Often more effective than spring.'},
+    10:{title:'Last broadleaf spray (November)',body:'Apply before first hard frost. Weeds must still be actively growing for herbicide absorption.'},
+  }},
+  { label:'Watering focus', color:'#185FA5', active:[5,6,7], details:{
+    5:{title:'Establish watering schedule (June)',body:'Start deep, infrequent watering: 1 to 1.5 inches per week, applied 2–3 times per week. Early morning is best — reduces evaporation and fungal risk.'},
+    6:{title:'Summer watering (July)',body:'Most critical period for cool-season grasses. Keep dormant grass alive with ½ inch every 2 weeks minimum. If irrigating to keep it green, maintain 1–1.5 inches/week consistently.'},
+    7:{title:'Late summer watering (August)',body:'Continue 1–1.5 inches/week. As temps drop after mid-August, the lawn recovers from summer stress. Ramp up slightly in preparation for fall overseeding.'},
+  }},
+  { label:'Soil test', color:'#534AB7', active:[7], details:{
+    7:{title:'Soil test (August)',body:'Send a soil sample to Purdue Extension in late August. Results guide fall fertilizer and lime applications. Cost ~$15–20. Indiana soils often need lime to raise pH to 6.5–7.0 — the sweet spot for cool-season turf.'},
+  }},
+];
 
-    function renderSchedule() {
-      const container = document.getElementById('schedule-rows');
-      tasks.forEach(task => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:grid;grid-template-columns:90px 1fr;gap:0;';
-        const label = document.createElement('div');
-        label.className = 'task-row-label';
-        label.textContent = task.label;
-        const bars = document.createElement('div');
-        bars.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
-        for (let m = 0; m < 12; m++) {
-          const slot = document.createElement('div');
-          slot.className = 'bar-slot' + (task.active.includes(m) ? '' : ' inactive');
-          slot.style.background = task.active.includes(m) ? task.color : '#f0f0f0';
-          if (task.active.includes(m)) {
-            slot.addEventListener('click', () => {
-              const d = task.details[m];
-              if (!d) return;
-              document.getElementById('detail-title').textContent = d.title;
-              document.getElementById('detail-body').textContent = d.body;
-              document.getElementById('detail-box').style.display = 'block';
-            });
-          }
-          bars.appendChild(slot);
-        }
-        row.appendChild(label);
-        row.appendChild(bars);
-        container.appendChild(row);
-      });
+const lawnSeasons = [
+  { title:'Early spring (Mar–Apr)', color:'#BA7517', items:['Pre-emergent is priority #1 — apply when soil hits 50°F (mid-March).','Light fertilizer application (0.5 lb N/1,000 sq ft).','Spot-treat broadleaf weeds as they emerge.','Do NOT overseed while pre-emergent is active.']},
+  { title:'Late spring / Summer (May–Aug)', color:'#185FA5', items:['Mow at 3.5–4 inches to shade soil and suppress crabgrass.','Water deeply 2–3x per week. Shallow watering encourages crabgrass.','Avoid fertilizing during peak heat (July–Aug).','Soil test in late August to guide fall applications.']},
+  { title:'Fall (Sep–Nov)', color:'#3B6D11', items:['Core aerate + overseed in mid-September to thicken the lawn.','Heaviest fertilizer applications of the year (Sep and Oct/Nov).','Broadleaf herbicide in October — most effective time of year.','Apply lime if your soil test recommends it.']},
+  { title:'Winter (Dec–Feb)', color:'#534AB7', items:['No lawn treatments needed.','Order pre-emergent early — sells out in Feb/March.','Review what worked this season and plan adjustments.']},
+];
+
+const treeTasks = [
+  { label:'Watering', color:'#185FA5', active:[0,1,2,3,4,5,6,7,8,9,10,11], details:{
+    0:{title:'Winter watering (January)',body:'Water once if there has been no rain or snow for 3+ weeks and temps are above freezing. Young arborvitae can desiccate in dry winters. Target the root zone, not the foliage.'},
+    1:{title:'Winter watering (February)',body:'Water during winter thaws if soil is dry. This is especially important heading into the spring growth flush.'},
+    2:{title:'Spring watering ramp-up (March)',body:'Begin regular watering as temperatures rise. Aim for 1–1.5 inches per week at the root zone. Deep, infrequent watering (2–3x per week) encourages deep root growth.'},
+    3:{title:'Active growth watering (April)',body:'Continue 1–1.5 inches per week. Peak spring growth — consistent moisture now drives strong establishment. Check soil moisture 2–3 inches down before watering.'},
+    4:{title:'Active growth watering (May)',body:'Maintain 1–1.5 inches per week. Mornings are ideal. Avoid wetting foliage in the evening — arborvitae are susceptible to fungal issues in humid conditions.'},
+    5:{title:'Summer watering — critical (June)',body:'Increase to 1.5–2 inches per week during heat. Young arborvitae in their second year are still establishing roots and have very little drought tolerance. Never let soil dry out completely.'},
+    6:{title:'Peak summer watering (July)',body:'Most critical month. Water deeply 3x per week if temps exceed 85°F. Wilting or browning tips are a sign of drought stress — act immediately. Mulch helps retain moisture significantly.'},
+    7:{title:'Late summer watering (August)',body:'Continue deep watering 2–3x per week. As temps drop in late August, you can begin reducing frequency slightly. Interior browning of old needles is normal; tip browning is not.'},
+    8:{title:'Fall watering (September)',body:'Reduce to 1–1.5 inches per week as temps cool. Continue through September — trees are storing energy for winter. Do not stop watering just because it feels like fall.'},
+    9:{title:'Fall watering (October)',body:'Water 1–2x per week until the ground freezes. A well-hydrated tree going into winter is far more resilient than a dry one. Critical for preventing winter burn.'},
+    10:{title:'Pre-winter watering (November)',body:'Give each tree a deep winterization watering before the ground freezes. This is one of the most important things you can do to prevent winter burn on young arborvitae.'},
+    11:{title:'Winter dormancy (December)',body:'Water only during warm spells above freezing if soil is dry. Trees are mostly dormant but roots remain active in mild temperatures.'},
+  }},
+  { label:'Fertilize', color:'#3B6D11', active:[2,3,8], details:{
+    2:{title:'Early spring fertilizer (March)',body:'Apply a slow-release evergreen fertilizer (e.g. Holly-tone or 10-8-6) as new growth begins. Do not over-fertilize — 1–2 lbs per tree at this size. Excess nitrogen causes weak, leggy growth and reduces cold hardiness.'},
+    3:{title:'Spring fertilizer follow-up (April)',body:'Optional light application mid-April if growth seems slow. Use a fertilizer with micronutrients — iron and manganese help maintain deep green color. Avoid high-nitrogen lawn fertilizers.'},
+    8:{title:'Fall fertilizer (September)',body:'Apply a low-nitrogen, high-phosphorus fertilizer (e.g. 5-10-10 or bone meal) in early September to encourage root development before winter. Do NOT use high-nitrogen in fall — it stimulates growth that frost will kill.'},
+  }},
+  { label:'Mulching', color:'#854F0B', active:[2,3,10], details:{
+    2:{title:'Spring mulch refresh (March)',body:'Apply or refresh a 3–4 inch layer of wood chip mulch around each tree, extending to the drip line (2–3 feet from trunk). Keep mulch 2–3 inches away from the trunk to prevent rot.'},
+    3:{title:'Top off mulch (April)',body:'Check depth and top off after winter breakdown. Consistent mulch is one of the highest-impact, lowest-effort things you can do for young arborvitae.'},
+    10:{title:'Winter mulch layer (November)',body:'Add an extra inch of mulch around the root zone before winter. Insulates roots from freeze-thaw cycles that heave soil and damage young root systems.'},
+  }},
+  { label:'Winter wrap', color:'#534AB7', active:[9,10,11,0,1], details:{
+    9:{title:'Install burlap wrap (October)',body:'Wrap each tree loosely in burlap to protect from winter burn and deer browse. Do not wrap tightly — air circulation matters. Burlap screens, not tight wrapping, are ideal.'},
+    10:{title:'Finalize winter protection (November)',body:'Ensure all 10 trees are wrapped or screened. Check stakes if any trees were planted with support. Install deer repellent if deer pressure is present in your area.'},
+    11:{title:'Monitor for snow load (December)',body:'After heavy wet snowfall, gently brush snow off branches with a broom using upward strokes. Arborvitae branches can split permanently under heavy snow load. Do not shake the tree.'},
+    0:{title:'Monitor snow load (January)',body:'Continue monitoring after snowstorms. Brush off accumulated wet snow gently. Check that burlap wrap is still intact and hasn\'t blown off or been disturbed by wildlife.'},
+    1:{title:'Prepare to remove wrap (February)',body:'Begin watching for consistent daytime temps above 40°F in late February. Remove burlap gradually as warming begins — do not leave it on past mid-March.'},
+  }},
+  { label:'Pest / disease', color:'#993556', active:[3,4,5,8], details:{
+    3:{title:'Spring inspection (April)',body:'Inspect all 10 trees as new growth emerges. Look for: bagworms (small bags hanging from branches), spider mites (fine webbing), and tip blight (brown tips from fungal disease). Early detection is critical.'},
+    4:{title:'Bagworm spray window (May)',body:'Late May is the ideal time to spray for bagworms — when larvae are newly hatched and small. Use Bt or spinosad for organic control, or bifenthrin for conventional. Once bags are large, sprays are far less effective.'},
+    5:{title:'Mid-summer pest check (June)',body:'Inspect for spider mites, which thrive in hot dry conditions. Look for yellowing or stippled foliage and fine webbing. Treat with insecticidal soap or neem oil.'},
+    8:{title:'Fall disease inspection (September)',body:'Full inspection before winter. Look for canker diseases, root rot signs (yellowing from the bottom up), and structural issues. Note any trees that underperformed — they may need drainage attention.'},
+  }},
+  { label:'Pruning', color:'#1D9E75', active:[2,3], details:{
+    2:{title:'Light shaping only (March)',body:'Giant Arborvitae need very little pruning at 4 feet. Do NOT hard prune — they do not regenerate from old wood. Remove dead, damaged, or crossing branches only. Never cut into brown interior wood.'},
+    3:{title:'Minor shaping (April)',body:'Lightly trim any wayward new growth to encourage a uniform conical shape. Use sharp hand pruners, not hedge shears. Aim to maintain a natural pyramidal form rather than a forced shape.'},
+  }},
+];
+
+const treeSeasons = [
+  { title:'Early spring (Mar–Apr)', color:'#3B6D11', items:['Resume deep watering — 1 to 1.5 inches per week at the root zone.','Apply slow-release evergreen fertilizer as new growth begins.','Refresh mulch layer to 3–4 inches around each tree.','Remove burlap gradually once temps consistently stay above 40°F.','Inspect for winter damage and overwintering pests.']},
+  { title:'Late spring / Summer (May–Aug)', color:'#185FA5', items:['Increase watering to 1.5–2 inches/week in heat — critical for year-2 trees.','Spray for bagworms in late May while larvae are small.','Monitor for spider mites in hot, dry stretches — treat with neem oil.','Never fertilize with high-nitrogen products in summer heat.','Tip browning signals drought stress — interior browning is normal.']},
+  { title:'Fall (Sep–Nov)', color:'#534AB7', items:['Apply low-nitrogen root-building fertilizer in early September.','Continue watering until the ground freezes.','Deep winterization watering before first hard freeze.','Add extra mulch layer in November to insulate roots.','Install burlap screens in October — winter burn and deer protection.']},
+  { title:'Winter (Dec–Feb)', color:'#854F0B', items:['Brush heavy snow off branches using upward strokes after storms.','Water during warm spells above freezing if soil is dry.','Check burlap wrap integrity after storms.','Remove burlap gradually starting late February.','Plan any spacing adjustments for spring.']},
+];
+
+function buildGrid(tasks, gridId, detailId, titleId, bodyId) {
+  const grid = document.getElementById(gridId);
+
+  const headerRow = document.createElement('div');
+  headerRow.className = 'month-header-row';
+  headerRow.innerHTML = '<div></div>';
+  MONTHS.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'month-lbl';
+    d.textContent = m;
+    headerRow.appendChild(d);
+  });
+  grid.appendChild(headerRow);
+
+  tasks.forEach(task => {
+    const row = document.createElement('div');
+    row.className = 'task-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'task-lbl';
+    lbl.textContent = task.label;
+    row.appendChild(lbl);
+
+    for (let m = 0; m < 12; m++) {
+      const bar = document.createElement('div');
+      const isOn = task.active.includes(m);
+      bar.className = 'bar' + (isOn ? ' on' : '');
+      bar.style.background = isOn ? task.color : '#ece9e3';
+      if (!isOn) bar.style.opacity = '0.35';
+      if (isOn && task.details[m]) {
+        bar.addEventListener('click', () => {
+          document.getElementById(titleId).textContent = task.details[m].title;
+          document.getElementById(bodyId).textContent = task.details[m].body;
+          const panel = document.getElementById(detailId);
+          panel.classList.add('visible');
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      }
+      row.appendChild(bar);
     }
+    grid.appendChild(row);
+  });
+}
 
-    function renderSeasonCards() {
-      const container = document.getElementById('season-cards');
-      seasonCards.forEach(card => {
-        const el = document.createElement('div');
-        el.className = 'season-card';
-        el.style.borderLeft = '3px solid ' + card.color;
-        el.innerHTML = '<h3>' + card.season + '</h3>';
-        const ul = document.createElement('ul');
-        card.actions.forEach(a => { const li = document.createElement('li'); li.textContent = a; ul.appendChild(li); });
-        el.appendChild(ul);
-        container.appendChild(el);
-      });
-    }
+function buildSeasons(seasons, containerId, accentColor) {
+  const container = document.getElementById(containerId);
+  seasons.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'season-card';
+    card.style.borderTopColor = s.color;
+    card.style.setProperty('--dot-color', s.color);
+    card.innerHTML = '<h3>' + s.title + '</h3>';
+    const ul = document.createElement('ul');
+    s.items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    container.appendChild(card);
+  });
+}
 
-    renderSchedule();
-    renderSeasonCards();
-  </script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector('[data-tab="' + name + '"]').classList.add('active');
+}
+
+buildGrid(lawnTasks, 'lawn-grid', 'lawn-detail', 'lawn-detail-title', 'lawn-detail-body');
+buildGrid(treeTasks, 'tree-grid', 'tree-detail', 'tree-detail-title', 'tree-detail-body');
+buildSeasons(lawnSeasons, 'lawn-seasons');
+buildSeasons(treeSeasons, 'tree-seasons');
+</script>
 </body>
-
 </html>
