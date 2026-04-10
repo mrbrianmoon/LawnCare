@@ -570,7 +570,7 @@
 const SUPABASE_URL  = 'https://tlymkljfdrrukyyrlzbe.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_yBDOlNaR0qqZT770k4mg5Q_88ARi0D8';
 
-const sbReady = SUPABASE_URL !== 'https://tlymkljfdrrukyyrlzbe.supabase.co';
+const sbReady = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
 const sb = sbReady ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // In-memory store: itemKey -> { done, note }
