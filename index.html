@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yard Care — Central Indiana</title>
@@ -21,6 +19,21 @@
     --accent-tree: #1D5C8A;
     --tab-h: 56px;
   }
+
+  body.dark {
+    --bg: #18181a;
+    --surface: #232326;
+    --border: #2e2e32;
+    --text: #f0ede8;
+    --muted: #9a9790;
+    --hint: #5a5855;
+    --accent-lawn: #5aad2a;
+    --accent-tree: #4a9fd4;
+  }
+
+  body.dark .detail-panel  { background: #1e1e21; }
+  body.dark .bar:not(.on)  { background: #2a2a2e !important; }
+  body.dark .login-field input { background: #2a2a2e; }
 
   body {
     font-family: 'DM Sans', sans-serif;
@@ -246,28 +259,25 @@
     font-weight: 500;
   }
 
-.note-input {
-  flex: 1;
-  min-width: 160px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 5px 9px;
-  outline: none;
-  transition: border-color 0.15s;
-  resize: none;
-  overflow: hidden;
-  line-height: 1.5;
-  min-height: 30px;
-  display: block;
-  width: 100%;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
-}
+  .note-input {
+    flex: 1;
+    min-width: 160px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.5;
+    min-height: 30px;
+    display: block;
+    width: 100%;
+  }
 
   .note-input::placeholder { color: var(--hint); }
   .note-input:focus { border-color: var(--accent-lawn); }
@@ -480,7 +490,26 @@
     flex-shrink: 0;
   }
 
-  .signout-btn:hover { color: var(--muted); }
+  /* Theme toggle button */
+  .theme-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--hint);
+    cursor: pointer;
+    padding: 0 0.6rem;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    align-self: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .theme-btn:hover { color: var(--muted); border-color: var(--muted); }
 </style>
 </head>
 <body>
@@ -514,6 +543,7 @@
     <span id="db-label">connecting…</span>
   </div>
   <button class="signout-btn" id="signout-btn" style="display:none" onclick="handleSignOut()">Sign out</button>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode">☀︎ <span id="theme-label">Light</span></button>
 </header>
 
 <div id="tab-lawn" class="tab-panel active">
@@ -572,8 +602,8 @@
 // SUPABASE CONFIG — replace these two values
 // after you create your project (see setup guide)
 // ─────────────────────────────────────────────
-const SUPABASE_URL  = 'https://tlymkljfdrrukyyrlzbe.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_yBDOlNaR0qqZT770k4mg5Q_88ARi0D8';
+const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY';
 
 const sbReady = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
 const sb = sbReady ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -600,6 +630,23 @@ function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
 }
+
+// ── Theme toggle ─────────────────────────────
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('theme-btn').innerHTML =
+    isDark ? '🌙 <span id="theme-label">Dark</span>'
+           : '☀︎ <span id="theme-label">Light</span>';
+  localStorage.setItem('yc-theme', isDark ? 'dark' : 'light');
+}
+
+// Restore saved theme preference on load
+(function() {
+  if (localStorage.getItem('yc-theme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('theme-btn').innerHTML = '🌙 <span id="theme-label">Dark</span>';
+  }
+})();
 
 // ── 1. AUTH: restore session on page load ────
 async function initAuth() {
