@@ -161,11 +161,30 @@
     border-radius: 3px;
     background: #ece9e3;
     transition: opacity 0.15s;
+    position: relative;
   }
 
   .bar.on { cursor: pointer; }
   .bar.on:hover { opacity: 0.75; }
 
+  /* Checkmark overlay on completed bars */
+  .bar.done::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .bar.done { opacity: 0.6; }
+  .bar.done:hover { opacity: 0.45; }
+
+  /* ── Detail panel ── */
   .detail-panel {
     margin-top: 1rem;
     padding: 1rem 1.25rem;
@@ -191,6 +210,88 @@
     line-height: 1.65;
   }
 
+  /* ── Completion row inside detail panel ── */
+  .completion-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .done-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .done-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-lawn);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .done-checkbox span {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .note-input {
+    flex: 1;
+    min-width: 160px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.5;
+    min-height: 30px;
+    display: block;
+    width: 100%;
+  }
+
+  .note-input::placeholder { color: var(--hint); }
+  .note-input:focus { border-color: var(--accent-lawn); }
+
+  .save-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--surface);
+    background: var(--accent-lawn);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+
+  .save-btn:hover { opacity: 0.8; }
+  .save-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .save-status {
+    font-size: 11px;
+    color: var(--hint);
+    flex-shrink: 0;
+    min-width: 60px;
+  }
+
+  /* ── Season cards ── (unchanged) */
   .season-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -240,16 +341,162 @@
 
   .season-card ul li:last-child { border-bottom: none; }
 
+  /* ── DB status badge in header ── */
+  .db-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--hint);
+    padding-left: 1.5rem;
+  }
+
+  .db-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.3s;
+  }
+
+  .db-dot.ok   { background: #4CAF50; }
+  .db-dot.err  { background: #E53935; }
+  .db-dot.busy { background: #FFA726; }
+
   @media (max-width: 640px) {
     header { padding: 0 1rem; }
     .site-title { font-size: 15px; padding-right: 1rem; }
     .container { padding: 1.5rem 1rem; }
     .task-lbl { font-size: 9px; padding-right: 6px; }
     .season-cards { grid-template-columns: 1fr; }
+    .db-status span { display: none; }
   }
+
+  /* ── Login overlay ── */
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  #login-overlay.hidden { display: none; }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 2.25rem;
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .login-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .login-card p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: -8px;
+  }
+
+  .login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .login-field label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--hint);
+  }
+
+  .login-field input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .login-field input:focus { border-color: var(--accent-lawn); }
+
+  .login-submit {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--surface);
+    background: var(--accent-lawn);
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 2px;
+  }
+
+  .login-submit:hover { opacity: 0.85; }
+  .login-submit:disabled { opacity: 0.4; cursor: default; }
+
+  .login-error {
+    font-size: 12px;
+    color: #E53935;
+    min-height: 16px;
+  }
+
+  /* Sign-out link in header */
+  .signout-btn {
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--hint);
+    cursor: pointer;
+    padding: 0 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .signout-btn:hover { color: var(--muted); }
 </style>
 </head>
 <body>
+
+<!-- Login overlay — hidden once authenticated -->
+<div id="login-overlay">
+  <div class="login-card">
+    <h2>Yard Care</h2>
+    <p>Sign in to sync your progress</p>
+    <div class="login-field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" autocomplete="email" placeholder="you@example.com">
+    </div>
+    <div class="login-field">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="login-submit" id="login-submit" onclick="handleLogin()">Sign in</button>
+  </div>
+</div>
 
 <header>
   <div class="site-title">Yard Care</div>
@@ -257,6 +504,11 @@
     <button class="tab-btn active" data-tab="lawn" onclick="switchTab('lawn')">Lawn</button>
     <button class="tab-btn" data-tab="arborvitae" onclick="switchTab('arborvitae')">Arborvitae</button>
   </nav>
+  <div class="db-status">
+    <div class="db-dot" id="db-dot"></div>
+    <span id="db-label">connecting…</span>
+  </div>
+  <button class="signout-btn" id="signout-btn" style="display:none" onclick="handleSignOut()">Sign out</button>
 </header>
 
 <div id="tab-lawn" class="tab-panel active">
@@ -268,6 +520,15 @@
     <div class="detail-panel" id="lawn-detail">
       <h3 id="lawn-detail-title"></h3>
       <p id="lawn-detail-body"></p>
+      <div class="completion-row">
+        <label class="done-checkbox">
+          <input type="checkbox" id="lawn-done-check">
+          <span>Completed</span>
+        </label>
+        <textarea class="note-input" id="lawn-note-input" placeholder="Add a note (date done, product used, etc.)" rows="1" oninput="autoResize(this)"></textarea>
+        <button class="save-btn" id="lawn-save-btn" onclick="saveDetail('lawn')">Save</button>
+        <span class="save-status" id="lawn-save-status"></span>
+      </div>
     </div>
     <div class="section-label">Key actions by season</div>
     <div class="season-cards" id="lawn-seasons"></div>
@@ -283,13 +544,240 @@
     <div class="detail-panel" id="tree-detail">
       <h3 id="tree-detail-title"></h3>
       <p id="tree-detail-body"></p>
+      <div class="completion-row">
+        <label class="done-checkbox">
+          <input type="checkbox" id="tree-done-check">
+          <span>Completed</span>
+        </label>
+        <textarea class="note-input" id="tree-note-input" placeholder="Add a note (date done, product used, etc.)" rows="1" oninput="autoResize(this)"></textarea>
+        <button class="save-btn" id="tree-save-btn" onclick="saveDetail('tree')">Save</button>
+        <span class="save-status" id="tree-save-status"></span>
+      </div>
     </div>
     <div class="section-label">Key actions by season</div>
     <div class="season-cards" id="tree-seasons"></div>
   </div>
 </div>
 
+<!-- Supabase JS client (v2, ESM-compatible CDN build) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
 <script>
+// ─────────────────────────────────────────────
+// SUPABASE CONFIG — replace these two values
+// after you create your project (see setup guide)
+// ─────────────────────────────────────────────
+const SUPABASE_URL  = 'https://tlymkljfdrrukyyrlzbe.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_yBDOlNaR0qqZT770k4mg5Q_88ARi0D8';
+
+const sbReady = SUPABASE_URL !== 'https://tlymkljfdrrukyyrlzbe.supabase.co';
+const sb = sbReady ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// In-memory store: itemKey -> { done, note }
+const state = {};
+
+// Track which item key is currently open per panel
+let activeKey = { lawn: null, tree: null };
+
+// Current authenticated user (set after login / session restore)
+let currentUser = null;
+
+// ── DB status indicator ──────────────────────
+function setDbStatus(mode, label) {
+  const dot = document.getElementById('db-dot');
+  const lbl = document.getElementById('db-label');
+  dot.className = 'db-dot ' + mode;
+  lbl.textContent = label;
+}
+
+// ── Auto-resize textarea ─────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+// ── 1. AUTH: restore session on page load ────
+async function initAuth() {
+  if (!sbReady) {
+    setDbStatus('err', 'not configured');
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    showApp();
+    loadAll();
+  } else {
+    showLogin();
+  }
+}
+
+// ── 2. AUTH: sign in handler ─────────────────
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+  const btn      = document.getElementById('login-submit');
+
+  errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    errEl.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+    return;
+  }
+
+  currentUser = data.user;
+  showApp();
+  loadAll();
+}
+
+// ── 3. AUTH: sign out handler ────────────────
+async function handleSignOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  // Clear local state so next user starts fresh
+  Object.keys(state).forEach(k => delete state[k]);
+  applyAllBadges();
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById('login-overlay').classList.remove('hidden');
+  document.getElementById('signout-btn').style.display = 'none';
+  setDbStatus('err', 'signed out');
+}
+
+function showApp() {
+  document.getElementById('login-overlay').classList.add('hidden');
+  document.getElementById('signout-btn').style.display = '';
+}
+
+// Allow pressing Enter in password field to submit
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ── Load all saved records from Supabase ─────
+async function loadAll() {
+  if (!sbReady || !currentUser) return;
+  setDbStatus('busy', 'loading…');
+  try {
+    const { data, error } = await sb
+      .from('completions')
+      .select('item_key, done, note')
+      .eq('user_id', currentUser.id);        // only this user's rows
+    if (error) throw error;
+    data.forEach(row => {
+      state[row.item_key] = { done: row.done, note: row.note || '' };
+    });
+    applyAllBadges();
+    setDbStatus('ok', 'synced');
+  } catch (e) {
+    console.error('Supabase load error:', e);
+    setDbStatus('err', 'offline');
+  }
+}
+
+// ── Apply ✓ badges to bars whose keys are done ─
+function applyAllBadges() {
+  document.querySelectorAll('.bar.on[data-key]').forEach(bar => {
+    const s = state[bar.dataset.key];
+    if (s && s.done) {
+      bar.classList.add('done');
+    } else {
+      bar.classList.remove('done');
+    }
+  });
+}
+
+// ── Open a detail panel for a given bar ──────
+function openDetail(panel, key, title, body) {
+  const panelId    = panel + '-detail';
+  const titleEl    = document.getElementById(panel + '-detail-title');
+  const bodyEl     = document.getElementById(panel + '-detail-body');
+  const checkEl    = document.getElementById(panel + '-done-check');
+  const noteEl     = document.getElementById(panel + '-note-input');
+  const statusEl   = document.getElementById(panel + '-save-status');
+
+  activeKey[panel] = key;
+
+  titleEl.textContent = title;
+  bodyEl.textContent  = body;
+
+  const saved = state[key] || { done: false, note: '' };
+  checkEl.checked      = saved.done;
+  noteEl.value         = saved.note;
+  statusEl.textContent = '';
+
+  // Resize textarea to fit restored note
+  autoResize(noteEl);
+
+  const detailEl = document.getElementById(panelId);
+  detailEl.classList.add('visible');
+  detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Save handler (called by Save button) ─────
+async function saveDetail(panel) {
+  const key = activeKey[panel];
+  if (!key) return;
+
+  const checkEl  = document.getElementById(panel + '-done-check');
+  const noteEl   = document.getElementById(panel + '-note-input');
+  const saveBtn  = document.getElementById(panel + '-save-btn');
+  const statusEl = document.getElementById(panel + '-save-status');
+
+  const done = checkEl.checked;
+  const note = noteEl.value.trim();
+
+  // Optimistic local update
+  state[key] = { done, note };
+  applyAllBadges();
+
+  if (!sbReady || !currentUser) {
+    statusEl.textContent = '(local only)';
+    return;
+  }
+
+  saveBtn.disabled = true;
+  statusEl.textContent = 'saving…';
+  setDbStatus('busy', 'saving…');
+
+  try {
+    const { error } = await sb
+      .from('completions')
+      .upsert(
+        {
+          item_key:   key,
+          done,
+          note,
+          updated_at: new Date().toISOString(),
+          user_id:    currentUser.id           // required by RLS policy
+        },
+        { onConflict: 'item_key' }
+      );
+    if (error) throw error;
+    statusEl.textContent = 'saved ✓';
+    setDbStatus('ok', 'synced');
+    setTimeout(() => { statusEl.textContent = ''; }, 2500);
+  } catch (e) {
+    console.error('Supabase save error:', e);
+    statusEl.textContent = 'error — check console';
+    setDbStatus('err', 'save failed');
+  } finally {
+    saveBtn.disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const lawnTasks = [
@@ -384,9 +872,20 @@ const treeSeasons = [
   { title:'Winter (Dec–Feb)', color:'#854F0B', items:['Brush heavy snow off branches using upward strokes after storms.','Water during warm spells above freezing if soil is dry.','Check burlap wrap integrity after storms.','Remove burlap gradually starting late February.','Plan any spacing adjustments for spring.']},
 ];
 
-function buildGrid(tasks, gridId, detailId, titleId, bodyId) {
+// ─────────────────────────────────────────────
+// GRID + SEASON BUILDERS
+// ─────────────────────────────────────────────
+
+// Generate a stable key for each task+month combination
+// Format: "lawn:Pre-emergent:2"  or  "tree:Watering:6"
+function makeKey(prefix, taskLabel, monthIndex) {
+  return prefix + ':' + taskLabel.replace(/\s+/g, '_') + ':' + monthIndex;
+}
+
+function buildGrid(tasks, gridId, panel) {
   const grid = document.getElementById(gridId);
 
+  // Month header row
   const headerRow = document.createElement('div');
   headerRow.className = 'month-header-row';
   headerRow.innerHTML = '<div></div>';
@@ -398,9 +897,11 @@ function buildGrid(tasks, gridId, detailId, titleId, bodyId) {
   });
   grid.appendChild(headerRow);
 
+  // Task rows
   tasks.forEach(task => {
     const row = document.createElement('div');
     row.className = 'task-row';
+
     const lbl = document.createElement('div');
     lbl.className = 'task-lbl';
     lbl.textContent = task.label;
@@ -412,13 +913,17 @@ function buildGrid(tasks, gridId, detailId, titleId, bodyId) {
       bar.className = 'bar' + (isOn ? ' on' : '');
       bar.style.background = isOn ? task.color : '#ece9e3';
       if (!isOn) bar.style.opacity = '0.35';
+
       if (isOn && task.details[m]) {
+        const key = makeKey(panel, task.label, m);
+        bar.dataset.key = key;
+
+        // Apply badge if already loaded from DB
+        const saved = state[key];
+        if (saved && saved.done) bar.classList.add('done');
+
         bar.addEventListener('click', () => {
-          document.getElementById(titleId).textContent = task.details[m].title;
-          document.getElementById(bodyId).textContent = task.details[m].body;
-          const panel = document.getElementById(detailId);
-          panel.classList.add('visible');
-          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          openDetail(panel, key, task.details[m].title, task.details[m].body);
         });
       }
       row.appendChild(bar);
@@ -427,7 +932,7 @@ function buildGrid(tasks, gridId, detailId, titleId, bodyId) {
   });
 }
 
-function buildSeasons(seasons, containerId, accentColor) {
+function buildSeasons(seasons, containerId) {
   const container = document.getElementById(containerId);
   seasons.forEach(s => {
     const card = document.createElement('div');
@@ -453,10 +958,16 @@ function switchTab(name) {
   document.querySelector('[data-tab="' + name + '"]').classList.add('active');
 }
 
-buildGrid(lawnTasks, 'lawn-grid', 'lawn-detail', 'lawn-detail-title', 'lawn-detail-body');
-buildGrid(treeTasks, 'tree-grid', 'tree-detail', 'tree-detail-title', 'tree-detail-body');
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+buildGrid(lawnTasks, 'lawn-grid', 'lawn');
+buildGrid(treeTasks, 'tree-grid', 'tree');
 buildSeasons(lawnSeasons, 'lawn-seasons');
 buildSeasons(treeSeasons, 'tree-seasons');
+
+// Load saved state from Supabase after DOM is built
+initAuth();
 </script>
 </body>
 </html>
