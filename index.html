@@ -772,11 +772,12 @@ function openDetail(panel, key, title, body) {
   noteEl.value         = saved.note;
   statusEl.textContent = '';
 
-  // Resize textarea to fit restored note
-  autoResize(noteEl);
-
   const detailEl = document.getElementById(panelId);
   detailEl.classList.add('visible');
+
+  // Resize textarea AFTER panel is visible so scrollHeight is measurable
+  autoResize(noteEl);
+
   detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
